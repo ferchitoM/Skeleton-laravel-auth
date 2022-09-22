@@ -3,7 +3,6 @@
 use App\Http\Controllers\Api\AuthController;
 use App\Http\Controllers\Api\EmailVerificationController;
 use App\Http\Controllers\Api\NewPasswordController;
-use App\Http\Controllers\DataController;
 use App\Http\Controllers\InstructorController;
 use Illuminate\Support\Facades\Route;
 
@@ -19,8 +18,8 @@ use Illuminate\Support\Facades\Route;
 */
 
 //*PUBLIC ROUTES
-Route::post('/register', [AuthController::class, 'register']);
-Route::post('/login', [AuthController::class, 'login']);
+Route::post('register', [AuthController::class, 'register']);
+Route::post('login', [AuthController::class, 'login']);
 
 //*RESET PASSWORD
 Route::post('forgot-password', [NewPasswordController::class, 'forgotPassword']);
@@ -37,15 +36,14 @@ Route::middleware(['auth:sanctum'])->group(function () {
     // Route::get('/email/verify', fn () => view('auth.verify-email')->name('verification.notice')); <-- Vista
 
     //*LOGOUT
-    Route::get('/logout', [AuthController::class, 'logout']);
+    Route::get('logout', [AuthController::class, 'logout']);
 });
 
 //TODO: AUTH & EMAIL VERIFIED  ROUTES
 Route::middleware(['auth:sanctum', 'verified'])->group(function () {
 
     //*USER
-    Route::get('/user', [AuthController::class, 'user']);
-    Route::resource('data', DataController::class);
+    Route::get('user', [AuthController::class, 'user']);
 
     //*INSTRUCTOR
     Route::resource('instructors', InstructorController::class);
