@@ -7,7 +7,6 @@ use Illuminate\Contracts\Auth\MustVerifyEmail;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Foundation\Auth\User as Authenticatable;
 use Illuminate\Notifications\Notifiable;
-use Illuminate\Support\Facades\URL;
 use Laravel\Sanctum\HasApiTokens;
 
 class User extends Authenticatable implements MustVerifyEmail {
@@ -22,6 +21,7 @@ class User extends Authenticatable implements MustVerifyEmail {
         'name',
         'email',
         'password',
+        'roles_id',
     ];
 
     /**
@@ -43,8 +43,8 @@ class User extends Authenticatable implements MustVerifyEmail {
         'email_verified_at' => 'datetime',
     ];
 
-    public function myImages() {
-        return $this->hasMany(data::class);
+    public function roles() {
+        return $this->belongsTo(Roles::class);
     }
 
     public function sendPasswordResetNotification($token) {

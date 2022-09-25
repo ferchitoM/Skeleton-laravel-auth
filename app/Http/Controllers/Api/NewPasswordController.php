@@ -23,14 +23,14 @@ class NewPasswordController extends Controller {
         );
 
         if ($status == Password::RESET_LINK_SENT) {
-            return [
+            return response([
                 'message' => __($status)
-            ];
+            ], 200);
         }
 
-        return [
+        return response([
             'message' => trans($status)
-        ];
+        ], 403);
     }
 
     public function reset(Request $request) {

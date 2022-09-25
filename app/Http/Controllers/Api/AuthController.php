@@ -19,9 +19,10 @@ class AuthController extends Controller {
         ]);
 
         $user = User::create([
+            'roles_id' => 2, //All registered user have the USER role (id=2)
             'name' => $request->name,
             'email' => $request->email,
-            'password' => Hash::make($request->password)
+            'password' => Hash::make($request->password),
         ]);
 
         // $new_user = User::create($request->all());
@@ -45,8 +46,11 @@ class AuthController extends Controller {
             ], 403);
         }
 
+        // dd($request->user()->roles->code);
+
         return response([
             'user' =>  $request->user(),
+            'role' => $request->user()->roles->code, //User role code (A: amdin, U: user)
             'token' => $request->user()->createToken('secret')->plainTextToken
         ], 200);
     }
