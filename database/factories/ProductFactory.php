@@ -5,20 +5,20 @@ namespace Database\Factories;
 use Illuminate\Database\Eloquent\Factories\Factory;
 
 /**
- * @extends \Illuminate\Database\Eloquent\Factories\Factory<\App\Models\instructor>
+ * @extends \Illuminate\Database\Eloquent\Factories\Factory<\App\Models\Product>
  */
-class InstructorFactory extends Factory {
+class ProductFactory extends Factory {
     /**
      * Define the model's default state.
      *
      * @return array<string, mixed>
      */
     public function definition() {
-        //CREATE 100 INSTRUCTORS
         return [
-            'dni' => $this->faker->ean8(),
             'name' => $this->faker->name(),
-            'area' => $this->faker->catchPhrase(),
+            'price' => $this->faker->numberBetween(10000, 1000000),
+            'stock' => $this->faker->numberBetween(0, 100),
+            'image' => null,
         ];
     }
 }

@@ -2,10 +2,11 @@
 
 namespace App\Http\Controllers;
 
-use App\Models\instructor;
+use App\Models\Product;
+use App\Http\Controllers\Controller;
 use Illuminate\Http\Request;
 
-class InstructorController extends Controller {
+class ProductController extends Controller {
     /**
      * Display a listing of the resource.
      *
@@ -13,8 +14,8 @@ class InstructorController extends Controller {
      */
     public function index() {
         return response([
-            'instructors' => instructor::all(),
-        ], 200);
+            'product_list' => Product::all()
+        ]);
     }
 
     /**
@@ -39,20 +40,20 @@ class InstructorController extends Controller {
     /**
      * Display the specified resource.
      *
-     * @param  \App\Models\instructor  $instructor
+     * @param  \App\Models\Product  $product
      * @return \Illuminate\Http\Response
      */
-    public function show(instructor $instructor) {
+    public function show(Product $product) {
         //
     }
 
     /**
      * Show the form for editing the specified resource.
      *
-     * @param  \App\Models\instructor  $instructor
+     * @param  \App\Models\Product  $product
      * @return \Illuminate\Http\Response
      */
-    public function edit(instructor $instructor) {
+    public function edit(Product $product) {
         //
     }
 
@@ -60,20 +61,20 @@ class InstructorController extends Controller {
      * Update the specified resource in storage.
      *
      * @param  \Illuminate\Http\Request  $request
-     * @param  \App\Models\instructor  $instructor
+     * @param  \App\Models\Product  $product
      * @return \Illuminate\Http\Response
      */
-    public function update(Request $request, instructor $instructor) {
+    public function update(Request $request, Product $product) {
         //
     }
 
     /**
      * Remove the specified resource from storage.
      *
-     * @param  \App\Models\instructor  $instructor
+     * @param  \App\Models\Product  $product
      * @return \Illuminate\Http\Response
      */
-    public function destroy(instructor $instructor) {
+    public function destroy(Product $product) {
         //
     }
 }

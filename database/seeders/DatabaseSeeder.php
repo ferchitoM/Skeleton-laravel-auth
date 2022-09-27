@@ -2,6 +2,7 @@
 
 namespace Database\Seeders;
 
+use App\Models\Product;
 use App\Models\Roles;
 use App\Models\User;
 use Illuminate\Database\Console\Seeds\WithoutModelEvents;
@@ -44,5 +45,7 @@ class DatabaseSeeder extends Seeder {
                 'password' => Hash::make('admin123') //default admin password: admin123
             ]
         );
+
+        Product::factory(100)->create();
     }
 }
