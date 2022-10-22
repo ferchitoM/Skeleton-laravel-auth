@@ -2,7 +2,6 @@
 
 namespace App\Http\Controllers;
 
-use App\Models\Clients;
 use App\Http\Controllers\Controller;
 use App\Models\User;
 use Illuminate\Http\Request;
@@ -59,29 +58,12 @@ class ClientsController extends Controller {
             'password' => Hash::make($request->password),
         ]);
 
-        return response([
-            'message' => 'Cliente creado exitósamente.'
-        ]);
-    }
-
-    /**
-     * Display the specified resource.
-     *
-     * @param  \App\Models\Clients  $clients
-     * @return \Illuminate\Http\Response
-     */
-    public function show(Clients $clients) {
-        //
-    }
-
-    /**
-     * Show the form for editing the specified resource.
-     *
-     * @param  \App\Models\Clients  $clients
-     * @return \Illuminate\Http\Response
-     */
-    public function edit(Clients $clients) {
-        //
+        return response(
+            [
+                'message' => 'Cliente creado exitósamente.',
+                'new_user' => $user //Nuevo usuario creado
+            ]
+        );
     }
 
     /**
@@ -91,8 +73,20 @@ class ClientsController extends Controller {
      * @param  \App\Models\Clients  $clients
      * @return \Illuminate\Http\Response
      */
-    public function update(Request $request, Clients $clients) {
-        //
+    public function update(Request $request, $id) {
+
+        $client = User::find($id);
+
+        $request->validate([
+            'name' => 'required|string',
+            'email' => 'required|email|unique:users,email,' . $client->id,
+        ]);
+
+        $client->fill($request->all())->save();
+
+        return response([
+            'message' => 'Cliente actualizado exitósamente.'
+        ]);
     }
 
     /**
@@ -101,7 +95,12 @@ class ClientsController extends Controller {
      * @param  \App\Models\Clients  $clients
      * @return \Illuminate\Http\Response
      */
-    public function destroy(Clients $clients) {
-        //
+    public function destroy($id) {
+        $client = User::find($id);
+        $client->delete();
+
+        return response([
+            'message' => 'Cliente eliminado exitósamente.'
+        ]);
     }
 }
