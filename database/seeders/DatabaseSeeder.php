@@ -46,6 +46,18 @@ class DatabaseSeeder extends Seeder {
             ]
         );
 
+        //CREATE SOME USER
+        User::insert(
+            [
+                'roles_id' =>  2, //user role id
+                'name' =>  'fer mar', //default name
+                'email' => 'ferchito.marles@gmail.com', //default email
+                'email_verified_at' => date("Y/m/d"), //verified today
+                'created_at' => date("Y/m/d"), //created today
+                'password' => Hash::make('fernando') //default admin password: admin123
+            ]
+        );
+
         Product::factory(100)->create();
     }
 }

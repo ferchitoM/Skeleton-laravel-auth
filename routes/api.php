@@ -3,6 +3,7 @@
 use App\Http\Controllers\Api\AuthController;
 use App\Http\Controllers\Api\EmailVerificationController;
 use App\Http\Controllers\Api\NewPasswordController;
+use App\Http\Controllers\ClientsController;
 use App\Http\Controllers\ProductController;
 use Illuminate\Support\Facades\Route;
 
@@ -46,5 +47,6 @@ Route::middleware(['auth:sanctum', 'verified'])->group(function () {
     Route::get('user', [AuthController::class, 'user']);
 
     //*PRODUCTS
+    Route::resource('clients', ClientsController::class);
     Route::resource('products', ProductController::class);
 });
