@@ -111,13 +111,14 @@ class ClientsController extends Controller {
     }
 
     public function validate_image($request) {
+
         if ($request->hasfile('image')) {
             $file = $request->file('image');
             $name = uniqid() . time() . '.' . $file->getClientOriginalExtension(); //46464611435281365.jpg
-            $url = public_path() . '/uploads'; // http://127.0.0.1:8000/public
+            $url = public_path() . '/uploads'; // Save into public/uploads folder on server
 
             $file->move($url, $name);
-            $url = 'uploads/' . $name; //uploads/46464611435281365.jpg
+            $url = env('APP_URL') . '/uploads' . '/' . $name; //http://127.0.0.1:8000/uploads/46464611435281365.jpg
             return $url;
         } else {
 
