@@ -88,6 +88,30 @@ class ClientsController extends Controller {
             'image' => 'nullable|image|max:2048'
         ]);
 
+        //validar la imagen
+        $url_old__image = $request->old_image; //imagen anterior
+
+
+        if ($request->action == "update") {
+            //Save image in server and get its url
+            $url_new_image = $this->validate_image($request);
+
+            //Eliminar la imagen anterior
+            if (File::exists($Candidato->Imagen)) {
+                File::delete($Candidato->Imagen);
+            }
+        }
+
+        if ($request->action == "delete_image") {
+
+            //Eliminar la imagen anterior
+            if (File::exists($direccion)) {
+                File::delete($direccion);
+            }
+
+            $direccion = null;
+        }
+
         $client->fill($request->all())->save();
 
         return response([
