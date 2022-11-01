@@ -48,14 +48,19 @@ class ClientsController extends Controller {
         $request->validate([
             'name' => 'required|string',
             'email' => 'required|email|unique:users',
-            'password' => 'required|min:6|confirmed'
+            'password' => 'required|min:6|confirmed',
+            'image' => 'nullable|image|max:2048'
         ]);
+
+        //Save image in server and get its url
+        $url_image = $this->validate_image($request);
 
         $user = User::create([
             'roles_id' => 2, //All registered user have the USER role (id=2)
             'name' => $request->name,
             'email' => $request->email,
             'password' => Hash::make($request->password),
+            'image' => $url_image,
         ]);
 
         return response(
@@ -80,6 +85,7 @@ class ClientsController extends Controller {
         $request->validate([
             'name' => 'required|string',
             'email' => 'required|email|unique:users,email,' . $client->id,
+            'image' => 'nullable|image|max:2048'
         ]);
 
         $client->fill($request->all())->save();
@@ -102,5 +108,20 @@ class ClientsController extends Controller {
         return response([
             'message' => 'Cliente eliminado exitósamente.'
         ]);
+    }
+
+    public function validate_image($request) {
+        if ($request->hasfile('image')) {
+            $file = $request->file('image');
+            $name = uniqid() . time() . '.' . $file->getClientOriginalExtension(); //46464611435281365.jpg
+            $url = public_path() . '/uploads'; // http://127.0.0.1:8000/public
+
+            $file->move($url, $name);
+            $url = 'uploads/' . $name; //uploads/46464611435281365.jpg
+            return $url;
+        } else {
+
+            return null;
+        }
     }
 }
