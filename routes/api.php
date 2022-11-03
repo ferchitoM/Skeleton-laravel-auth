@@ -46,7 +46,12 @@ Route::middleware(['auth:sanctum', 'verified'])->group(function () {
     //*USER
     Route::get('user', [AuthController::class, 'user']);
 
-    //*PRODUCTS
+    //*CLIENTS
     Route::resource('clients', ClientsController::class);
+
+    //!RUTAS PARA ACTUALIZAR IMAGENES
+    Route::post('clients/update/{client}', [ClientsController::class, 'update']);
+    //!...
+
     Route::resource('products', ProductController::class);
 });

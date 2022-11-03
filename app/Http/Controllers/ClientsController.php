@@ -7,6 +7,8 @@ use App\Models\User;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Hash;
+use Illuminate\Support\Facades\File;
+
 
 class ClientsController extends Controller {
     /**
@@ -49,7 +51,7 @@ class ClientsController extends Controller {
             'name' => 'required|string',
             'email' => 'required|email|unique:users',
             'password' => 'required|min:6|confirmed',
-            'image' => 'nullable|image|max:2048'
+            'image' => 'nullable|image'
         ]);
 
         //Save image in server and get its url
@@ -85,34 +87,25 @@ class ClientsController extends Controller {
         $request->validate([
             'name' => 'required|string',
             'email' => 'required|email|unique:users,email,' . $client->id,
-            'image' => 'nullable|image|max:2048'
+            'image' => 'nullable|image'
         ]);
 
-        //validar la imagen
-        $url_old__image = $request->old_image; //imagen anterior
+        $url_image = null;
 
+        //Guardar nueva imagen
+        if ($request->image_updated)
+            $url_image = $this->validate_image($request);
 
-        if ($request->action == "update") {
-            //Save image in server and get its url
-            $url_new_image = $this->validate_image($request);
-
-            //Eliminar la imagen anterior
-            if (File::exists($Candidato->Imagen)) {
-                File::delete($Candidato->Imagen);
-            }
+        //Eliminar la imagen anterior
+        if ($request->image_updated || $request->image == null) {
+            if (File::exists(public_path($client->image)))
+                File::delete(public_path($client->image));
         }
 
-        if ($request->action == "delete_image") {
-
-            //Eliminar la imagen anterior
-            if (File::exists($direccion)) {
-                File::delete($direccion);
-            }
-
-            $direccion = null;
-        }
-
-        $client->fill($request->all())->save();
+        $client->name = $request->name;
+        $client->email = $request->email;
+        $client->image = $url_image;
+        $client->save();
 
         return response([
             'message' => 'Cliente actualizado exitósamente.'
@@ -139,11 +132,11 @@ class ClientsController extends Controller {
         if ($request->hasfile('image')) {
             $file = $request->file('image');
             $name = uniqid() . time() . '.' . $file->getClientOriginalExtension(); //46464611435281365.jpg
-            $url = public_path() . '/uploads'; // Save into public/uploads folder on server
+            $folder = public_path() . '/uploads'; // Save into public/uploads folder on server
 
-            $file->move($url, $name);
-            $url = env('APP_URL') . '/uploads' . '/' . $name; //http://127.0.0.1:8000/uploads/46464611435281365.jpg
-            return $url;
+            $file->move($folder, $name);
+            $url_image = '/uploads' . '/' . $name; //uploads/46464611435281365.jpg
+            return $url_image;
         } else {
 
             return null;
