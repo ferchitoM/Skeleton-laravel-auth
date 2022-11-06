@@ -4,6 +4,7 @@ namespace App\Http\Controllers;
 
 use App\Http\Controllers\Controller;
 use App\Models\User;
+use Exception;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Hash;
@@ -87,28 +88,35 @@ class ClientsController extends Controller {
         $request->validate([
             'name' => 'required|string',
             'email' => 'required|email|unique:users,email,' . $client->id,
-            'image' => 'nullable|image'
         ]);
 
         $url_image = null;
 
-        //Guardar nueva imagen
-        if ($request->image_updated)
-            $url_image = $this->validate_image($request);
+        try {
+            //Guardar nueva imagen
+            if ($request->updated) {
+                $url_image = $this->validate_image($request);
+                $client->image = $url_image;
+            }
 
-        //Eliminar la imagen anterior
-        if ($request->image_updated || $request->image == null) {
-            if (File::exists(public_path($client->image)))
-                File::delete(public_path($client->image));
+            //Eliminar la imagen anterior
+            if ($request->updated || $request->image == null) {
+                if (File::exists(public_path($client->image)))
+                    File::delete(public_path($client->image));
+            }
+        } catch (Exception $e) {
+            return response([
+                'message' => 'Error: ' . $e->getMessage(),
+            ]);
         }
 
         $client->name = $request->name;
         $client->email = $request->email;
-        $client->image = $url_image;
         $client->save();
 
         return response([
-            'message' => 'Cliente actualizado exitósamente.'
+            'message' => 'Cliente actualizado exitósamente.',
+            'client' => $request
         ]);
     }
 
@@ -129,17 +137,21 @@ class ClientsController extends Controller {
 
     public function validate_image($request) {
 
+        $request->validate([
+            'image' => 'nullable|image'
+        ]);
+
         if ($request->hasfile('image')) {
-            $file = $request->file('image');
-            $name = uniqid() . time() . '.' . $file->getClientOriginalExtension(); //46464611435281365.jpg
-            $folder = public_path() . '/uploads'; // Save into public/uploads folder on server
+            if ($request->hasfile('image')) {
+                $name = uniqid() . time() . '.' . $request->image->getClientOriginalExtension(); //46464611435281365.jpg
+                $request->image->move(public_path('uploads'), $name); // http://127.0.0.1:8000/uploads
+                $url = '/uploads' . '/' . $name; //uploads/46464611435281365.jpg
 
-            $file->move($folder, $name);
-            $url_image = '/uploads' . '/' . $name; //uploads/46464611435281365.jpg
-            return $url_image;
-        } else {
+                return $url;
+            } else {
 
-            return null;
+                return null;
+            }
         }
     }
 }
