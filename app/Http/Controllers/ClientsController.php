@@ -52,24 +52,20 @@ class ClientsController extends Controller {
             'name' => 'required|string',
             'email' => 'required|email|unique:users',
             'password' => 'required|min:6|confirmed',
-            'image' => 'nullable|image'
+            'image' => 'nullable|max:1024'
         ]);
-
-        //Save image in server and get its url
-        $url_image = $this->validate_image($request);
 
         $user = User::create([
             'roles_id' => 2, //All registered user have the USER role (id=2)
             'name' => $request->name,
             'email' => $request->email,
             'password' => Hash::make($request->password),
-            'image' => $url_image,
+            'image' => $request->image,
         ]);
 
         return response(
             [
                 'message' => 'Cliente creado exitósamente.',
-                'new_user' => $user //Nuevo usuario creado
             ]
         );
     }
@@ -88,35 +84,16 @@ class ClientsController extends Controller {
         $request->validate([
             'name' => 'required|string',
             'email' => 'required|email|unique:users,email,' . $client->id,
+            'image' => 'nullable'
         ]);
-
-        $url_image = null;
-
-        try {
-            //Guardar nueva imagen
-            if ($request->updated) {
-                $url_image = $this->validate_image($request);
-                $client->image = $url_image;
-            }
-
-            //Eliminar la imagen anterior
-            if ($request->updated || $request->image == null) {
-                if (File::exists(public_path($client->image)))
-                    File::delete(public_path($client->image));
-            }
-        } catch (Exception $e) {
-            return response([
-                'message' => 'Error: ' . $e->getMessage(),
-            ]);
-        }
 
         $client->name = $request->name;
         $client->email = $request->email;
+        $client->image = $request->image;
         $client->save();
 
         return response([
             'message' => 'Cliente actualizado exitósamente.',
-            'client' => $request
         ]);
     }
 
@@ -133,25 +110,5 @@ class ClientsController extends Controller {
         return response([
             'message' => 'Cliente eliminado exitósamente.'
         ]);
-    }
-
-    public function validate_image($request) {
-
-        $request->validate([
-            'image' => 'nullable|image'
-        ]);
-
-        if ($request->hasfile('image')) {
-            if ($request->hasfile('image')) {
-                $name = uniqid() . time() . '.' . $request->image->getClientOriginalExtension(); //46464611435281365.jpg
-                $request->image->move(public_path('uploads'), $name); // http://127.0.0.1:8000/uploads
-                $url = '/uploads' . '/' . $name; //uploads/46464611435281365.jpg
-
-                return $url;
-            } else {
-
-                return null;
-            }
-        }
     }
 }
