@@ -142,16 +142,18 @@ class ClientsController extends Controller {
         ]);
 
         if ($request->hasfile('image')) {
-            if ($request->hasfile('image')) {
-                $name = uniqid() . time() . '.' . $request->image->getClientOriginalExtension(); //46464611435281365.jpg
-                $request->image->move(public_path('uploads'), $name); // http://127.0.0.1:8000/uploads
-                $url = '/uploads' . '/' . $name; //uploads/46464611435281365.jpg
+            $name = uniqid() . time() . '.' . $request->file('image')->getClientOriginalExtension(); //46464611435281365.jpg
+            //$request->file('image')->move(public_path('uploads'), $name); // http://127.0.0.1:8000/uploads
 
-                return $url;
-            } else {
 
-                return null;
-            }
+            $request->file('image')->storeAs('public', $name);
+
+            $url = '/uploads' . '/' . $name; //uploads/46464611435281365.jpg
+
+            return $url;
+        } else {
+
+            return null;
         }
     }
 }
