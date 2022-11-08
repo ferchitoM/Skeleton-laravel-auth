@@ -3,13 +3,13 @@
 namespace App\Http\Controllers;
 
 use App\Http\Controllers\Controller;
+use App\Models\Roles;
 use App\Models\User;
 use Exception;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Facades\File;
-
 
 class ClientsController extends Controller {
     /**
@@ -18,16 +18,30 @@ class ClientsController extends Controller {
      * @return \Illuminate\Http\Response
      */
     public function index() {
-        $clients_list = DB::select(
+        $client_list = DB::select(
             'SELECT u.*, r.name AS role 
             FROM users u, roles r 
             WHERE roles_id = r.id
-            AND r.code != "A"
+            AND r.code = "U"
+            AND deleted_at IS NULL  
+            ORDER BY u.created_at DESC'
+        );
+        //NOTA: deleted_at IS NULL es para listar los usuarios no eliminados con softdeletes
+
+        $clients_list_deleted = DB::select(
+            'SELECT u.*, r.name AS role 
+            FROM users u, roles r 
+            WHERE roles_id = r.id
+            AND r.code = "U"
+            AND deleted_at IS NOT NULL  
             ORDER BY u.created_at DESC'
         );
 
         return response(
-            ['client_list' => $clients_list],
+            [
+                'client_list' => $client_list,
+                'client_list_deleted' => $clients_list_deleted
+            ],
             200
         );
     }
@@ -85,29 +99,25 @@ class ClientsController extends Controller {
 
         $client = User::find($id);
 
+
+
         $request->validate([
             'name' => 'required|string',
             'email' => 'required|email|unique:users,email,' . $client->id,
         ]);
 
-        $url_image = null;
+        //Guardar nueva imagen
+        if ($request->updated) {
 
-        try {
-            //Guardar nueva imagen
-            if ($request->updated) {
-                $url_image = $this->validate_image($request);
-                $client->image = $url_image;
-            }
+            $request->validate([
+                'image' => 'nullable|image'
+            ]);
 
             //Eliminar la imagen anterior
-            if ($request->updated || $request->image == null) {
-                if (File::exists(public_path($client->image)))
-                    File::delete(public_path($client->image));
-            }
-        } catch (Exception $e) {
-            return response([
-                'message' => 'Error: ' . $e->getMessage(),
-            ]);
+            if (File::exists(public_path($client->image)))
+                File::delete(public_path($client->image));
+
+            $client->image = $this->validate_image($request);
         }
 
         $client->name = $request->name;
@@ -116,7 +126,6 @@ class ClientsController extends Controller {
 
         return response([
             'message' => 'Cliente actualizado exitósamente.',
-            'client' => $request
         ]);
     }
 
@@ -135,22 +144,22 @@ class ClientsController extends Controller {
         ]);
     }
 
-    public function validate_image($request) {
+    public function restore($id) {
+        $client = User::withTrashed()->find($id); //withTrashed() to find soft-deleted users
+        $client->restore();
 
-        $request->validate([
-            'image' => 'nullable|image'
+        return response([
+            'message' => 'Cliente restablecido exitósamente.'
         ]);
+    }
+
+    public function validate_image($request) {
 
         if ($request->hasfile('image')) {
             $name = uniqid() . time() . '.' . $request->file('image')->getClientOriginalExtension(); //46464611435281365.jpg
-            //$request->file('image')->move(public_path('uploads'), $name); // http://127.0.0.1:8000/uploads
-
-
             $request->file('image')->storeAs('public', $name);
+            return '/storage' . '/' . $name; //uploads/46464611435281365.jpg
 
-            $url = '/uploads' . '/' . $name; //uploads/46464611435281365.jpg
-
-            return $url;
         } else {
 
             return null;

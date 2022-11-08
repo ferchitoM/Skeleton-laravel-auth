@@ -53,5 +53,9 @@ Route::middleware(['auth:sanctum', 'verified'])->group(function () {
     Route::post('clients/update/{client}', [ClientsController::class, 'update']);
     //!...
 
+    //!RUTAS PARA RESTABLECER ELIMINADOS
+    Route::delete('clients/restore/{client}', [ClientsController::class, 'restore']);
+    //!...
+
     Route::resource('products', ProductController::class);
 });
