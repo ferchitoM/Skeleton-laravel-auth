@@ -13,8 +13,8 @@ return new class extends Migration {
     public function up() {
         Schema::create('sales_products', function (Blueprint $table) {
             $table->id();
-            $table->foreignId('sales_id');
-            $table->foreignId('products_id');
+            $table->foreignId('sales_id')->constrained();
+            $table->foreignId('products_id')->constrained();
             $table->decimal('price', 11, 2);
             $table->integer('amount');
             $table->decimal('iva', 11, 2);

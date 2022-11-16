@@ -6,6 +6,7 @@ use App\Http\Controllers\Api\NewPasswordController;
 use App\Http\Controllers\ClientsController;
 use App\Http\Controllers\ProductController;
 use App\Http\Controllers\SalesController;
+use App\Http\Controllers\SalesProductsController;
 use Illuminate\Support\Facades\Route;
 
 /*
@@ -52,6 +53,8 @@ Route::middleware(['auth:sanctum', 'verified'])->group(function () {
 
     //*SHOPPING CART
     Route::resource('shopping', SalesController::class);
+    //*NEW SALE
+    Route::resource('shopping/newsale', SalesProductsController::class);
 
     //!RUTAS PARA ACTUALIZAR IMAGENES
     Route::post('clients/update/{client}', [ClientsController::class, 'update']);
